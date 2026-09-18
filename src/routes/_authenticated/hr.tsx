@@ -106,7 +106,10 @@ function HrPage() {
     roleByUser.set(row.user_id, [...(roleByUser.get(row.user_id) ?? []), row.role as string]);
   }
 
-  async function updateProfile(id: string, patch: Record<string, unknown>) {
+  async function updateProfile(
+    id: string,
+    patch: { job_title?: string | null; department?: string | null; manager_id?: string | null },
+  ) {
     const { error } = await supabase.from("profiles").update(patch).eq("id", id);
     if (error) {
       toast.error(error.message);
