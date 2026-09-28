@@ -56,7 +56,7 @@ function ReviewsPage() {
     queryKey: ["candidates", user?.id, isHr],
     enabled: !!user,
     queryFn: async () => {
-      let query = supabase.from("profiles").select("id, full_name, email, job_title").order("full_name");
+      let query = supabase.from("profiles_directory").select("id, full_name, job_title").order("full_name");
       if (!isHr) query = query.eq("manager_id", user!.id);
       const { data, error } = await query;
       if (error) throw error;
@@ -71,7 +71,7 @@ function ReviewsPage() {
       let query = supabase
         .from("reviews")
         .select(
-          "id, status, overall_score, updated_at, review_cycles(name), employee:profiles!reviews_employee_id_fkey(full_name, email, department), reviewer:profiles!reviews_reviewer_id_fkey(full_name)",
+          "id, status, overall_score, updated_at, review_cycles(name), employee:profiles_directory!reviews_employee_id_fkey(full_name, department), reviewer:profiles_directory!reviews_reviewer_id_fkey(full_name)",
         )
         .order("updated_at", { ascending: false });
       if (!isHr) query = query.eq("reviewer_id", user!.id);
@@ -137,8 +137,8 @@ function ReviewsPage() {
             </SelectTrigger>
             <SelectContent>
               {(candidates.data ?? []).map((person) => (
-                <SelectItem key={person.id} value={person.id}>
-                  {person.full_name || person.email}
+                <SelectItem key={person.id} value={person.id!}>
+                  {person.full_name || "Munkatárs"}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -162,12 +162,12 @@ function ReviewsPage() {
         ) : reviews.data?.length ? (
           <ul className="mt-4 divide-y">
             {reviews.data.map((review) => {
-              const employee = review.employee as { full_name: string; email: string; department: string | null } | null;
+              const employee = review.employee as { full_name: string; department: string | null } | null;
               const reviewer = review.reviewer as { full_name: string } | null;
               return (
                 <li key={review.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
                   <div>
-                    <p className="font-medium">{employee?.full_name || employee?.email || "Munkatárs"}</p>
+                    <p className="font-medium">{employee?.full_name || "Munkatárs"}</p>
                     <p className="text-xs text-muted-foreground">
                       {(review.review_cycles as { name: string } | null)?.name}
                       {employee?.department ? ` · ${employee.department}` : ""}

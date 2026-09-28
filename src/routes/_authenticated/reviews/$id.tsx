@@ -48,7 +48,7 @@ function ReviewDetail() {
       const { data, error } = await supabase
         .from("reviews")
         .select(
-          "*, review_cycles(name, status), employee:profiles!reviews_employee_id_fkey(full_name, email, job_title, department), reviewer:profiles!reviews_reviewer_id_fkey(full_name)",
+          "*, review_cycles(name, status), employee:profiles_directory!reviews_employee_id_fkey(full_name, job_title, department), reviewer:profiles_directory!reviews_reviewer_id_fkey(full_name)",
         )
         .eq("id", id)
         .maybeSingle();
@@ -143,7 +143,7 @@ function ReviewDetail() {
     );
 
   const employee = data.employee as
-    | { full_name: string; email: string; job_title: string | null; department: string | null }
+    | { full_name: string; job_title: string | null; department: string | null }
     | null;
 
   return (
@@ -152,7 +152,7 @@ function ReviewDetail() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{(data.review_cycles as { name: string } | null)?.name}</p>
-            <h1 className="mt-2 text-3xl font-semibold">{employee?.full_name || employee?.email}</h1>
+            <h1 className="mt-2 text-3xl font-semibold">{employee?.full_name || "Munkatárs"}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {[employee?.job_title, employee?.department].filter(Boolean).join(" · ") || "—"}
             </p>

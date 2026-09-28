@@ -53,8 +53,8 @@ function Dashboard() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, email, job_title, department")
+        .from("profiles_directory")
+        .select("id, full_name, job_title, department")
         .eq("manager_id", user!.id)
         .order("full_name");
       if (error) throw error;
@@ -68,7 +68,7 @@ function Dashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reviews")
-        .select("id, status, overall_score, cycle_id, employee_id, review_cycles(name), profiles!reviews_employee_id_fkey(full_name)")
+        .select("id, status, overall_score, cycle_id, employee_id, review_cycles(name), profiles_directory!reviews_employee_id_fkey(full_name)")
         .eq("reviewer_id", user!.id)
         .order("updated_at", { ascending: false })
         .limit(6);
@@ -126,7 +126,7 @@ function Dashboard() {
               {team.data.map((member) => (
                 <li key={member.id} className="flex items-center justify-between gap-3 py-3">
                   <div>
-                    <p className="font-medium">{member.full_name || member.email}</p>
+                    <p className="font-medium">{member.full_name || "Munkatárs"}</p>
                     <p className="text-xs text-muted-foreground">
                       {[member.job_title, member.department].filter(Boolean).join(" · ") || "—"}
                     </p>
@@ -152,7 +152,7 @@ function Dashboard() {
                 <li key={review.id} className="flex items-center justify-between gap-3 py-3">
                   <div>
                     <p className="font-medium">
-                      {(review.profiles as { full_name: string } | null)?.full_name || "Munkatárs"}
+                      {(review.profiles_directory as { full_name: string } | null)?.full_name || "Munkatárs"}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {(review.review_cycles as { name: string } | null)?.name}
