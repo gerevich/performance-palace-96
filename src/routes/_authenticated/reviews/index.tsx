@@ -137,7 +137,7 @@ function ReviewsPage() {
             </SelectTrigger>
             <SelectContent>
               {(candidates.data ?? []).map((person) => (
-                <SelectItem key={person.id} value={person.id}>
+                <SelectItem key={person.id} value={person.id!}>
                   {person.full_name || "Munkatárs"}
                 </SelectItem>
               ))}
